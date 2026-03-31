@@ -1,0 +1,6 @@
+@BirthdayWebsiteAPI_HostAddress = http://localhost:5137
+
+GET {{BirthdayWebsiteAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
