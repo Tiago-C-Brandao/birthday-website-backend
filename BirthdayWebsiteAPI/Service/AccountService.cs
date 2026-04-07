@@ -1,6 +1,6 @@
 ﻿using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
-using BirthdayWebsiteAPI.ViewModels;
+using BirthdayWebsiteAPI.ViewModels.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -84,7 +84,7 @@ namespace BirthdayWebsiteAPI.Service
 
             if (user == null)
             {
-                throw new Exception("Invalid username or WhatsApp number.");
+                throw new Exception("Username or WhatsApp not found.");
             }
 
             var roles = await _userManager.GetRolesAsync(user);

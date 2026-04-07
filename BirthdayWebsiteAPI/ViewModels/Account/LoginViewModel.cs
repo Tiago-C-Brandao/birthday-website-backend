@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BirthdayWebsiteAPI.ViewModels
+namespace BirthdayWebsiteAPI.ViewModels.Account
 {
     public class LoginViewModel
     {

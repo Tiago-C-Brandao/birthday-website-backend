@@ -1,5 +1,5 @@
 ﻿using BirthdayWebsiteAPI.Interface;
-using BirthdayWebsiteAPI.ViewModels;
+using BirthdayWebsiteAPI.ViewModels.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BirthdayWebsiteAPI.Controllers

@@ -1,4 +1,4 @@
-﻿namespace BirthdayWebsiteAPI.ViewModels
+﻿namespace BirthdayWebsiteAPI.ViewModels.Account
 {
     public class LoginInfo
     {

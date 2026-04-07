@@ -1,4 +1,4 @@
-﻿using BirthdayWebsiteAPI.ViewModels;
+﻿using BirthdayWebsiteAPI.ViewModels.Account;
 
 namespace BirthdayWebsiteAPI.Interface
 {
