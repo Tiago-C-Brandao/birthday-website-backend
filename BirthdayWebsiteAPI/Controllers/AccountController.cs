@@ -1,5 +1,6 @@
 ﻿using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.ViewModels.Account;
+using BirthdayWebsiteAPI.ViewModels.Guest;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BirthdayWebsiteAPI.Controllers
@@ -9,11 +10,13 @@ namespace BirthdayWebsiteAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
+        private readonly IGuestService _guestService;
 
 
-        public AccountController(IAccountService accountService)
+        public AccountController(IAccountService accountService, IGuestService guestService)
         {
             _accountService = accountService;
+            _guestService = guestService;
         }
 
         [HttpPost("register")]
@@ -25,9 +28,31 @@ namespace BirthdayWebsiteAPI.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                // Call the service to register the user
-                await _accountService.RegisterUser(model);
-                return Ok(new { message = "User registered successfully" });
+
+                var user = await _accountService.RegisterUser(model); 
+
+                var existingGuest = await _guestService.GetGuestByWhatsApp(model.WhatsApp);
+
+                if (existingGuest != null) 
+                {
+                    UpdateGuestViewModel guestUpdate = new UpdateGuestViewModel
+                    {
+                        UserId = user.Id,
+                    };
+                    await _guestService.UpdateGuest(existingGuest.Id, guestUpdate);
+                } else
+                {
+                    CreateGuestViewModel guest = new CreateGuestViewModel
+                    {
+                        FullName = model.FullName,
+                        WhatsApp = model.WhatsApp,
+                        UserId = user.Id,
+                    };
+                    await _guestService.CreateGuest(guest);
+                }
+
+
+                return Created("User created successfully", user);
             }
             catch (Exception ex)
             {
@@ -53,6 +78,7 @@ namespace BirthdayWebsiteAPI.Controllers
             }
         }
 
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try
