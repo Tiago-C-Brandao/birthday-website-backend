@@ -45,20 +45,34 @@ namespace BirthdayWebsiteAPI.Service
             return guest;
         }
 
-        public async Task DeleteGuest(int id)
+        public async Task<IEnumerable<Guest>> GetAllGuests(
+            string? accompanyingBy = null, 
+            string? userId = null, 
+            string? fullName = null, 
+            string? whatsapp = null,
+            bool? hasUser = null,
+            bool? hasAccompanying = null)
         {
-            var guest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
-            if (guest == null) 
-                throw new Exception("Guest not found!");
+            var query = _context.Guests.AsQueryable();
 
-            _context.Guests.Remove(guest);
-            await _context.SaveChangesAsync();
+            if (!string.IsNullOrEmpty(accompanyingBy))
+                query = query.Where(g => g.AccompanyingBy == accompanyingBy);
+            if(!string.IsNullOrEmpty(userId))
+                query = query.Where(g => g.UserId == userId);
+            if (!string.IsNullOrEmpty(fullName))
+                query = query.Where(g => g.FullName.Contains(fullName));
+            if (!string.IsNullOrEmpty(whatsapp))
+                query = query.Where(g => g.WhatsApp.Contains(whatsapp));
+            if(hasUser.HasValue && hasUser.Value)
+                query = query.Where(g => g.UserId != null);
+            if (hasUser.HasValue && hasUser.Value == false)
+                query = query.Where(g => g.UserId == null);
+            if (hasAccompanying.HasValue && hasAccompanying.Value)
+                query = query.Where(g => g.AccompanyingBy != null);
+            if (hasAccompanying.HasValue && hasAccompanying.Value == false)
+                query = query.Where(g => g.AccompanyingBy == null);
 
-        }
-
-        public async Task<IEnumerable<Guest>> GetAllGuests()
-        {
-            var guests = await _context.Guests.ToListAsync();
+            var guests = await query.ToListAsync();
             return guests;
         }
 
@@ -101,6 +115,17 @@ namespace BirthdayWebsiteAPI.Service
             _entityUpdates.UpdateProperties(currentGuest, model);
             await _context.SaveChangesAsync();
             return currentGuest;
+        }
+
+        public async Task DeleteGuest(int id)
+        {
+            var guest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
+            if (guest == null)
+                throw new Exception("Guest not found!");
+
+            _context.Guests.Remove(guest);
+            await _context.SaveChangesAsync();
+
         }
     }
 }

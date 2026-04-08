@@ -5,7 +5,13 @@ namespace BirthdayWebsiteAPI.Interface
 {
     public interface IGuestService
     {
-        Task<IEnumerable<Guest>> GetAllGuests();
+        Task<IEnumerable<Guest>> GetAllGuests(
+            string? accompanyingBy = null, 
+            string? userId = null, 
+            string? fullName = null, 
+            string? whatsapp = null, 
+            bool? hasUser = null, bool? 
+            hasAccompanying = null);
         Task<Guest> GetGuest(int id);
         Task<Guest> CreateGuest(CreateGuestViewModel model);
         Task<Guest> UpdateGuest(int id, UpdateGuestViewModel model);

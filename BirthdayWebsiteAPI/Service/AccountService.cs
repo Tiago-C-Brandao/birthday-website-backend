@@ -55,6 +55,7 @@ namespace BirthdayWebsiteAPI.Service
 
             return new LoginInfo
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 FullName = user.FullName,
                 WhatsApp = user.WhatsApp,
