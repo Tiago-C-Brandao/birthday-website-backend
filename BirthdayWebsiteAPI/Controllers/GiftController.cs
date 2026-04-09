@@ -85,6 +85,31 @@ namespace BirthdayWebsiteAPI.Controllers
             }
         }
 
+        [HttpPatch("users/{userId}/give/{giftId}")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> GiveGift(string userId, int giftId, [FromBody] GiveGiftViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                UpdateGiftViewModel updateModel = new UpdateGiftViewModel
+                {
+                    Available = true,
+                    UserId = userId,
+                    Message = model.Message,
+                };
+
+                var updatedGift = await _giftService.UpdateGift(giftId, updateModel);
+                return Ok(updatedGift);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteGift(int id)
