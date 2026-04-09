@@ -1,5 +1,6 @@
 ﻿using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
+using BirthdayWebsiteAPI.Models.Enums;
 using BirthdayWebsiteAPI.ViewModels.Guest;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,6 @@ namespace BirthdayWebsiteAPI.Controllers
                     return BadRequest(ModelState);
 
                 var guest = await _guestService.CreateGuest(model);
-
                 return Ok(guest);
 
             }
@@ -51,7 +51,8 @@ namespace BirthdayWebsiteAPI.Controllers
                 {
                     FullName = model.FullName,
                     WhatsApp = model.WhatsApp,
-                    AccompanyingBy = id
+                    AccompanyingBy = id,
+                    Status = GuestStatus.Pending,
                 });
 
                 return Ok(guest);
@@ -70,11 +71,12 @@ namespace BirthdayWebsiteAPI.Controllers
             string? fullName = null,
             string? whatsapp = null,
             bool? hasUser = null,
-            bool? hasAccompanying = null)
+            bool? hasAccompanying = null,
+            GuestStatus? status = null)
         {
             try
             {
-                var guests = await _guestService.GetAllGuests(accompanyingBy, userId, fullName, whatsapp, hasUser, hasAccompanying);
+                var guests = await _guestService.GetAllGuests(accompanyingBy, userId, fullName, whatsapp, hasUser, hasAccompanying, status);
                 return Ok(guests);
             }
             catch (Exception ex)
@@ -119,6 +121,7 @@ namespace BirthdayWebsiteAPI.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
+
                 var guest = await _guestService.UpdateGuest(id, model);
                 return Ok(guest);
             }
@@ -135,6 +138,7 @@ namespace BirthdayWebsiteAPI.Controllers
             try
             {
                 await _guestService.DeleteGuest(id);
+
                 return Ok(new { message = "Guest deleted successfully" });
             }
             catch (Exception ex)

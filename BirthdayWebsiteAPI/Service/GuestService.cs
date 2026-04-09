@@ -2,6 +2,7 @@
 using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
+using BirthdayWebsiteAPI.Models.Enums;
 using BirthdayWebsiteAPI.ViewModels.Guest;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,8 @@ namespace BirthdayWebsiteAPI.Service
                 FullName = model.FullName,
                 WhatsApp = formatedWhatsApp,
                 UserId = model.UserId ?? null,
-                AccompanyingBy = model.AccompanyingBy ?? null
+                AccompanyingBy = model.AccompanyingBy ?? null,
+                Status = model.Status ?? GuestStatus.Confirmed,
             };
 
             _context.Guests.Add(guest);
@@ -51,7 +53,8 @@ namespace BirthdayWebsiteAPI.Service
             string? fullName = null, 
             string? whatsapp = null,
             bool? hasUser = null,
-            bool? hasAccompanying = null)
+            bool? hasAccompanying = null,
+            GuestStatus? status = null)
         {
             var query = _context.Guests.AsQueryable();
 
@@ -71,6 +74,8 @@ namespace BirthdayWebsiteAPI.Service
                 query = query.Where(g => g.AccompanyingBy != null);
             if (hasAccompanying.HasValue && hasAccompanying.Value == false)
                 query = query.Where(g => g.AccompanyingBy == null);
+            if(status.HasValue)
+                query = query.Where(g => g.Status == status.Value);
 
             var guests = await query.ToListAsync();
             return guests;

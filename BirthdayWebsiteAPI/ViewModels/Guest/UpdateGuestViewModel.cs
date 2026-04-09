@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BirthdayWebsiteAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BirthdayWebsiteAPI.ViewModels.Guest
 {
@@ -10,5 +11,7 @@ namespace BirthdayWebsiteAPI.ViewModels.Guest
         public string? WhatsApp { get; set; }
         public string? UserId { get; set; }
         public string? AccompanyingBy { get; set; }
+        [EnumDataType(typeof(GuestStatus))]
+        public GuestStatus? Status { get; set; }
     }
 }
