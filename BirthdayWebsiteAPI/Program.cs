@@ -50,6 +50,9 @@ namespace BirthdayWebsiteAPI
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IGuestService, GuestService>();
+            builder.Services.AddScoped<IGiftService, GiftService>();
+
+            // Add helper services
             builder.Services.AddScoped<EntityUpdates>();
             builder.Services.AddScoped<PhoneNumberFormatterAndValidator>();
 
