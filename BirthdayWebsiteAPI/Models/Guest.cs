@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BirthdayWebsiteAPI.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace BirthdayWebsiteAPI.Models
@@ -17,6 +18,8 @@ namespace BirthdayWebsiteAPI.Models
         public string WhatsApp { get; set; }
         public string? UserId { get; set; }
         public string? AccompanyingBy { get; set; }
+        [EnumDataType(typeof(GuestStatus))]
+        public GuestStatus Status { get; set; } = GuestStatus.Confirmed;
         public DateTime CreatedAt { get; set; }
     }
 }

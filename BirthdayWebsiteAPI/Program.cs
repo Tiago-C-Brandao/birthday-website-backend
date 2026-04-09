@@ -1,4 +1,5 @@
 using BirthdayWebsiteAPI.Data;
+using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
 using BirthdayWebsiteAPI.Service;
@@ -6,7 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
+
 
 namespace BirthdayWebsiteAPI
 {
@@ -46,6 +49,9 @@ namespace BirthdayWebsiteAPI
             // Add custom services
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IGuestService, GuestService>();
+            builder.Services.AddScoped<EntityUpdates>();
+            builder.Services.AddScoped<PhoneNumberFormatterAndValidator>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

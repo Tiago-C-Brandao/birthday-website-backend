@@ -1,6 +1,7 @@
-﻿using BirthdayWebsiteAPI.Interface;
+﻿using BirthdayWebsiteAPI.Helpers;
+using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
-using BirthdayWebsiteAPI.ViewModels;
+using BirthdayWebsiteAPI.ViewModels.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,69 +15,23 @@ namespace BirthdayWebsiteAPI.Service
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly PhoneNumberFormatterAndValidator _phoneNumberFormatterAndValidator;
 
-        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, PhoneNumberFormatterAndValidator formatPhoneNumber)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _phoneNumberFormatterAndValidator = formatPhoneNumber; 
         }
-
-        private string FormatWhatsappNumber(string whatsappNumber)
-        {
-            // Remove all non-numeric characters using regex
-            string cleanedPhone = Regex.Replace(whatsappNumber, @"[^\d]", "");
-
-            // If the phone number starts with "55" and has 13 digits, it already includes the country code
-            if (cleanedPhone.Length == 13 && cleanedPhone.StartsWith("55"))
-            {
-                return "+" + cleanedPhone; 
-            }
-            else if (cleanedPhone.Length == 11)
-            {
-                // If it's a valid 11-digit number (without +55), prepend "+55"
-                return "+55" + cleanedPhone;
-            }
-            else
-            {
-                throw new ArgumentException("Invalid phone number format.");
-            }
-        }
-
-        private bool IsPhoneNumber(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return false;
-
-            var trimmed = input.Trim();
-
-            // Remove all non-numeric characters using regex
-            string cleanedPhone = Regex.Replace(trimmed, @"[^\d]", "");
-
-            // Check if the cleaned phone number has the correct length (13 digits for +55XXXXXXXXXXX or 11 digits for XXXXXXXXXXX)
-            if (cleanedPhone.Length == 11)
-            {
-                return true;  // Valid phone number with 11 digits (e.g., 81995084567)
-            }
-            else if (cleanedPhone.Length == 13 && cleanedPhone.StartsWith("55")) 
-            {
-                return true;  // Valid phone number with +55 (e.g., +55819995084567)
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-
         public async Task<LoginInfo> Login(LoginViewModel model)
         {
 
-            bool isPhone = IsPhoneNumber(model.UserNameOrWhatsapp);
+            bool isPhone = _phoneNumberFormatterAndValidator.IsPhoneNumber(model.UserNameOrWhatsapp);
 
             if (isPhone)
             {
-                var formattedWhatsApp = FormatWhatsappNumber(model.UserNameOrWhatsapp);
+                var formattedWhatsApp = _phoneNumberFormatterAndValidator.FormatWhatsappNumber(model.UserNameOrWhatsapp);
                 model.UserNameOrWhatsapp = formattedWhatsApp;
             }
 
@@ -84,7 +39,7 @@ namespace BirthdayWebsiteAPI.Service
 
             if (user == null)
             {
-                throw new Exception("Invalid username or WhatsApp number.");
+                throw new Exception("Username or WhatsApp not found.");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -100,6 +55,7 @@ namespace BirthdayWebsiteAPI.Service
 
             return new LoginInfo
             {
+                Id = user.Id,
                 UserName = user.UserName,
                 FullName = user.FullName,
                 WhatsApp = user.WhatsApp,
@@ -113,10 +69,12 @@ namespace BirthdayWebsiteAPI.Service
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<bool> RegisterUser(RegisterViewModel model)
+        public async Task<User> RegisterUser(RegisterViewModel model)
         {
+            var formatedWhatsApp = _phoneNumberFormatterAndValidator.FormatWhatsappNumber(model.WhatsApp);
+
             var userNameValidate = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == model.UserName);
-            var whatsappValidate = await _userManager.Users.FirstOrDefaultAsync(u => u.WhatsApp == model.WhatsApp);
+            var whatsappValidate = await _userManager.Users.FirstOrDefaultAsync(u => u.WhatsApp == formatedWhatsApp);
 
             if (userNameValidate != null)
             {
@@ -128,9 +86,6 @@ namespace BirthdayWebsiteAPI.Service
                 throw new Exception("The whatsapp is already in use.");
             }
 
-
-            var formatedWhatsApp = FormatWhatsappNumber(model.WhatsApp);
-
             var newUser = new User
             {
                 UserName = model.UserName,
@@ -140,7 +95,7 @@ namespace BirthdayWebsiteAPI.Service
 
             var createdUser = await _userManager.CreateAsync(newUser, model.Password);
             var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
-            return createdUser.Succeeded;
+            return newUser;
         }
     }
 }
