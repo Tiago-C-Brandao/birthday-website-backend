@@ -11,6 +11,8 @@ namespace BirthdayWebsiteAPI.Models
         [Required]
         [DataType(DataType.Url)]
         public string ProductLink { get; set; }
+        [DataType(DataType.Url)]
+        public string? ImageLink { get; set; }
         public bool Available { get; set; } = false;
         public string? UserId { get; set; } // UserId of the guest who reserved it 
         public string? Message { get; set; }
