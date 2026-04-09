@@ -10,5 +10,7 @@ namespace BirthdayWebsiteAPI.ViewModels.Gift
         [Required]
         [DataType(DataType.Url)]
         public string ProductLink { get; set; }
+        [DataType(DataType.Url)]
+        public string? ImageLink { get; set; }
     }
 }

@@ -23,7 +23,8 @@ namespace BirthdayWebsiteAPI.Service
             Gift gift = new Gift
             {
                 GiftName = model.GiftName,
-                ProductLink = model.ProductLink
+                ProductLink = model.ProductLink,
+                ImageLink = model.ImageLink,
             };
 
             _context.Gifts.Add(gift);
