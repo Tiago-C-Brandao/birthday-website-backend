@@ -40,7 +40,7 @@ namespace BirthdayWebsiteAPI.Controllers
         }
 
         [HttpPost("{id}/addAccompanying")]
-        public async Task<IActionResult> AddAccompanying(string id,[FromBody] CreateGuestViewModel model)
+        public async Task<IActionResult> AddAccompanying(string id,[FromBody] CreateGuestByUserViewModel model)
         {
             try
             {
