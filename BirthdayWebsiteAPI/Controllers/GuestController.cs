@@ -39,8 +39,9 @@ namespace BirthdayWebsiteAPI.Controllers
             }
         }
 
-        [HttpPost("{id}/addAccompanying")]
-        public async Task<IActionResult> AddAccompanying(string id,[FromBody] CreateGuestByUserViewModel model)
+        [HttpPost("users/{userId}/accompanying")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> AddAccompanying(string userId,[FromBody] CreateGuestByUserViewModel model)
         {
             try
             {
@@ -51,7 +52,7 @@ namespace BirthdayWebsiteAPI.Controllers
                 {
                     FullName = model.FullName,
                     WhatsApp = model.WhatsApp,
-                    AccompanyingBy = id,
+                    AccompanyingBy = userId,
                     Status = GuestStatus.Pending,
                 });
 
@@ -99,12 +100,13 @@ namespace BirthdayWebsiteAPI.Controllers
             }
         }
 
-        [HttpGet("{id}/listAccompanyings")]
-        public async Task<ActionResult<Guest>> GetAllAccompanying(string id)
+        [HttpGet("users/{userId}/accompanyings")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult<Guest>> GetAllAccompanying(string userId)
         {
             try
             {
-                var guest = await _guestService.GetAllGuests(accompanyingBy: id);
+                var guest = await _guestService.GetAllGuests(accompanyingBy: userId);
                 return Ok(guest);
             }
             catch (Exception ex)

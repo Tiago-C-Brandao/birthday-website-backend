@@ -39,6 +39,7 @@ namespace BirthdayWebsiteAPI.Service
                 UserId = model.UserId ?? null,
                 AccompanyingBy = model.AccompanyingBy ?? null,
                 Status = model.Status ?? GuestStatus.Confirmed,
+                CreatedAt = DateTime.UtcNow,
             };
 
             _context.Guests.Add(guest);
