@@ -46,6 +46,19 @@ namespace BirthdayWebsiteAPI
                 };
             });
 
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp",
+                    policy =>
+                    {
+                        policy.WithOrigins(builder.Configuration["Cors:Host"])
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
+            });
+
             // Add custom services
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
@@ -76,9 +89,12 @@ namespace BirthdayWebsiteAPI
                 var services = scope.ServiceProvider;
                 var userManager = services.GetRequiredService<UserManager<User>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var configuration = services.GetRequiredService<IConfiguration>();
 
-                await AppDbContextSeed.SeedAdminUserAsync(userManager, roleManager);
+                await AppDbContextSeed.SeedAdminUserAsync(userManager, roleManager, configuration);
             }
+
+            app.UseCors("AllowReactApp");
 
             app.UseHttpsRedirection();
 

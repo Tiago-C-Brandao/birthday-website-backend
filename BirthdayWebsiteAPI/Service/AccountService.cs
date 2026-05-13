@@ -90,12 +90,23 @@ namespace BirthdayWebsiteAPI.Service
             {
                 UserName = model.UserName,
                 FullName = model.FullName,
-                WhatsApp = formatedWhatsApp
+                WhatsApp = formatedWhatsApp,
+                CreatedAt = DateTime.UtcNow
             };
 
             var createdUser = await _userManager.CreateAsync(newUser, model.Password);
             var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
-            return newUser;
+
+            var result = new User
+            {
+                Id = newUser.Id,
+                UserName = newUser.UserName,
+                FullName = newUser.FullName,
+                WhatsApp = newUser.WhatsApp,
+                CreatedAt = newUser.CreatedAt
+            };
+
+            return result;
         }
     }
 }

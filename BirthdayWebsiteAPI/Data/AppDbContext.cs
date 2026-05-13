@@ -19,8 +19,6 @@ namespace BirthdayWebsiteAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Provide fixed Id and ConcurrencyStamp values for seeded roles to avoid
-            // EF Core treating the seed data as changing on each model build.
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole { Id = "3f5d6a9e-1c2b-4d5e-9f6a-0a1b2c3d4e5f", Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = "a1b2c3d4-0000-0000-0000-000000000001" },
@@ -50,7 +48,7 @@ namespace BirthdayWebsiteAPI.Data
 
     public static class AppDbContextSeed
     {
-        public static async Task SeedAdminUserAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedAdminUserAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             var role = await roleManager.FindByNameAsync("Admin");
 
@@ -60,20 +58,23 @@ namespace BirthdayWebsiteAPI.Data
                 await roleManager.CreateAsync(role);
             }
 
-            var adminUser = await userManager.FindByEmailAsync("admin@example.com");
+            var adminSection = configuration.GetSection("AdminUser");
+
+
+            var adminUser = await userManager.FindByEmailAsync(adminSection["Email"]);
 
             if (adminUser == null)
             {
                 adminUser = new User
                 {
-                    UserName = "admin@example.com",
-                    Email = "admin@example.com",
-                    FullName = "Admin User",
-                    WhatsApp = "+55 81 99308-4709",
+                    UserName = adminSection["UserName"],
+                    Email = adminSection["Email"],
+                    FullName = adminSection["FullName"],
+                    WhatsApp = adminSection["Whatsapp"],
                     CreatedAt = DateTime.UtcNow
                 };
 
-                await userManager.CreateAsync(adminUser, "Admin@1234"); // Set a default password
+                await userManager.CreateAsync(adminUser, adminSection["Password"]); // Set a default password
                 await userManager.AddToRoleAsync(adminUser, "Admin");
             }
         }

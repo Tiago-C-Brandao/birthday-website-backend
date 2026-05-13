@@ -25,6 +25,7 @@ namespace BirthdayWebsiteAPI.Service
                 GiftName = model.GiftName,
                 ProductLink = model.ProductLink,
                 ImageLink = model.ImageLink,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Gifts.Add(gift);
