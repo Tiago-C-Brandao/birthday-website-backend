@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BirthdayWebsiteAPI.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BirthdayWebsiteAPI.ViewModels.Gift
 {
@@ -13,5 +14,11 @@ namespace BirthdayWebsiteAPI.ViewModels.Gift
         public bool? Available { get; set; } = false;
         public string? UserId { get; set; }
         public string? Message { get; set; }
+        public string? Author { get; set; }
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public double Price { get; set; }
+        [EnumDataType(typeof(GiftRarity))]
+        public GiftRarity? Rarity { get; set; } = GiftRarity.Common;
     }
 }
