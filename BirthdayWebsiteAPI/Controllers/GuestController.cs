@@ -73,11 +73,13 @@ namespace BirthdayWebsiteAPI.Controllers
             string? whatsapp = null,
             bool? hasUser = null,
             bool? hasAccompanying = null,
-            GuestStatus? status = null)
+            GuestStatus? status = null,
+            int pageNumber = 1,
+            int pageSize = 10)
         {
             try
             {
-                var guests = await _guestService.GetAllGuests(accompanyingBy, userId, fullName, whatsapp, hasUser, hasAccompanying, status);
+                var guests = await _guestService.GetAllGuests(accompanyingBy, userId, fullName, whatsapp, hasUser, hasAccompanying, status, pageNumber, pageSize);
                 return Ok(guests);
             }
             catch (Exception ex)

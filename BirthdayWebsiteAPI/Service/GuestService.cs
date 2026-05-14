@@ -3,6 +3,7 @@ using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
 using BirthdayWebsiteAPI.Models.Enums;
+using BirthdayWebsiteAPI.ViewModels;
 using BirthdayWebsiteAPI.ViewModels.Guest;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -48,15 +49,20 @@ namespace BirthdayWebsiteAPI.Service
             return guest;
         }
 
-        public async Task<IEnumerable<Guest>> GetAllGuests(
+        public async Task<PagedResultViewModel<Guest>> GetAllGuests(
             string? accompanyingBy = null, 
             string? userId = null, 
             string? fullName = null, 
             string? whatsapp = null,
             bool? hasUser = null,
             bool? hasAccompanying = null,
-            GuestStatus? status = null)
+            GuestStatus? status = null,
+            int pageNumber = 1,
+            int pageSize = 10)
         {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             var query = _context.Guests.AsQueryable();
 
             if (!string.IsNullOrEmpty(accompanyingBy))
@@ -78,8 +84,23 @@ namespace BirthdayWebsiteAPI.Service
             if(status.HasValue)
                 query = query.Where(g => g.Status == status.Value);
 
-            var guests = await query.ToListAsync();
-            return guests;
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await query
+                .OrderBy(g => g.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResultViewModel<Guest>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<Guest> GetGuest(int id)
