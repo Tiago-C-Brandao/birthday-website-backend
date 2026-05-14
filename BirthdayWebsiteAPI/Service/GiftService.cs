@@ -2,6 +2,7 @@
 using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
+using BirthdayWebsiteAPI.ViewModels;
 using BirthdayWebsiteAPI.ViewModels.Gift;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,9 @@ namespace BirthdayWebsiteAPI.Service
                 GiftName = model.GiftName,
                 ProductLink = model.ProductLink,
                 ImageLink = model.ImageLink,
+                Author = model.Author,
+                Price = model.Price,
+                Rarity = model.Rarity,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -34,12 +38,17 @@ namespace BirthdayWebsiteAPI.Service
             return gift;
         }
 
-        public async Task<IEnumerable<Gift>> GetAllGifts(
+        public async Task<PagedResultViewModel<Gift>> GetAllGifts(
             string? giftName,
             string? productLink,
             bool? avaliable,
-            string? userId)
+            string? userId,
+            int pageNumber = 1,
+            int pageSize = 10)
         {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
             var query = _context.Gifts.AsQueryable();
 
             if (!string.IsNullOrEmpty(giftName))
@@ -51,8 +60,23 @@ namespace BirthdayWebsiteAPI.Service
             if (!string.IsNullOrEmpty(userId))
                 query = query.Where(g => g.UserId == userId);
 
-            var gifts = await query.ToListAsync();
-            return gifts;
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await query
+                .OrderBy(g => g.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResultViewModel<Gift>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task<Gift> GetGiftById(int id)

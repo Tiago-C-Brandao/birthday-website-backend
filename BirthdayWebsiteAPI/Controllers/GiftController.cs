@@ -38,14 +38,17 @@ namespace BirthdayWebsiteAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gift>>> GetAllGifts(string? giftName,
+        public async Task<ActionResult<IEnumerable<Gift>>> GetAllGifts(
+            string? giftName,
             string? productLink,
             bool? avaliable,
-            string? userId)
+            string? userId,
+            int pageNumber = 1,
+            int pageSize = 10)
         {
             try
             {
-                var gifts = await _giftService.GetAllGifts(giftName, productLink, avaliable, userId);
+                var gifts = await _giftService.GetAllGifts(giftName, productLink, avaliable, userId, pageNumber, pageSize);
                 return Ok(gifts);
             }
             catch (Exception ex)
