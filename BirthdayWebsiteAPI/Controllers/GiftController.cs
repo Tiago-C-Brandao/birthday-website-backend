@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BirthdayWebsiteAPI.Controllers
 {
-    [Route("gift")]
+    [Route("api/gift")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GiftController : ControllerBase
@@ -41,14 +41,14 @@ namespace BirthdayWebsiteAPI.Controllers
         public async Task<ActionResult<IEnumerable<Gift>>> GetAllGifts(
             string? giftName,
             string? productLink,
-            bool? avaliable,
+            bool? available,
             string? userId,
             int pageNumber = 1,
             int pageSize = 10)
         {
             try
             {
-                var gifts = await _giftService.GetAllGifts(giftName, productLink, avaliable, userId, pageNumber, pageSize);
+                var gifts = await _giftService.GetAllGifts(giftName, productLink, available, userId, pageNumber, pageSize);
                 return Ok(gifts);
             }
             catch (Exception ex)
