@@ -16,7 +16,7 @@ namespace BirthdayWebsiteAPI.ViewModels.Gift
         public string? Message { get; set; }
         public string? Author { get; set; }
         [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        [DataType(DataType.Currency)]
         public double Price { get; set; }
         [EnumDataType(typeof(GiftRarity))]
         public GiftRarity? Rarity { get; set; } = GiftRarity.Common;

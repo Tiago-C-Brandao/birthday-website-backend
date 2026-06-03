@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BirthdayWebsiteAPI.Controllers
 {
-    [Route("guest")]
+    [Route("api/guest")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GuestController : Controller
@@ -109,7 +109,7 @@ namespace BirthdayWebsiteAPI.Controllers
             try
             {
                 var guest = await _guestService.GetAllGuests(accompanyingBy: userId);
-                return Ok(guest);
+                return Ok(guest.Items);
             }
             catch (Exception ex)
             {

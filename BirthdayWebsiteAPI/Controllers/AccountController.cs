@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BirthdayWebsiteAPI.Controllers
 {
-    [Route("account")]
+    [Route("api/account")]
     [ApiController]
     public class AccountController : ControllerBase
     {

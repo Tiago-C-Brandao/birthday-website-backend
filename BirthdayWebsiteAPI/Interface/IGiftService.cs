@@ -9,7 +9,7 @@ namespace BirthdayWebsiteAPI.Interface
         Task<PagedResultViewModel<Gift>> GetAllGifts(
             string? giftName, 
             string? productLink, 
-            bool? avaliable, 
+            bool? available, 
             string? userId,
             int pageNumber = 1,
             int pageSize = 10);
