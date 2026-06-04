@@ -1,13 +1,13 @@
 using BirthdayWebsiteAPI.Data;
 using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
+using BirthdayWebsiteAPI.Middlewares;
 using BirthdayWebsiteAPI.Models;
 using BirthdayWebsiteAPI.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using System.Text;
 
 
@@ -62,6 +62,7 @@ namespace BirthdayWebsiteAPI
             // Add custom services
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IRegistrationService, RegistrationService>();
             builder.Services.AddScoped<IGuestService, GuestService>();
             builder.Services.AddScoped<IGiftService, GiftService>();
 
@@ -70,11 +71,14 @@ namespace BirthdayWebsiteAPI
             builder.Services.AddScoped<PhoneNumberFormatterAndValidator>();
 
             builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -83,6 +87,22 @@ namespace BirthdayWebsiteAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseCors("AllowReactApp");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.MapFallbackToFile("index.html");
 
             using (var scope = app.Services.CreateScope())
             {
@@ -93,15 +113,6 @@ namespace BirthdayWebsiteAPI
 
                 await AppDbContextSeed.SeedAdminUserAsync(userManager, roleManager, configuration);
             }
-
-            app.UseCors("AllowReactApp");
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapControllers();
 
             app.Run();
         }
