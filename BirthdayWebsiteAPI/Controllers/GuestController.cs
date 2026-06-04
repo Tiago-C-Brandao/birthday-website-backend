@@ -24,44 +24,28 @@ namespace BirthdayWebsiteAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateGuest([FromBody] CreateGuestViewModel model)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var guest = await _guestService.CreateGuest(model);
-                return Ok(guest);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var guest = await _guestService.CreateGuest(model);
+            return Ok(guest);
         }
 
         [HttpPost("users/{userId}/accompanying")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> AddAccompanying(string userId,[FromBody] CreateGuestByUserViewModel model)
         {
-            try
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var guest = await _guestService.CreateGuest(new CreateGuestViewModel
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var guest = await _guestService.CreateGuest(new CreateGuestViewModel
-                {
-                    FullName = model.FullName,
-                    WhatsApp = model.WhatsApp,
-                    AccompanyingBy = userId,
-                    Status = GuestStatus.Pending,
-                });
-
-                return Ok(guest);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                FullName = model.FullName,
+                WhatsApp = model.WhatsApp,
+                AccompanyingBy = userId,
+                Status = GuestStatus.Pending,
+            });
+            return Ok(guest);
         }
 
         [HttpGet]
@@ -77,78 +61,51 @@ namespace BirthdayWebsiteAPI.Controllers
             int pageNumber = 1,
             int pageSize = 10)
         {
-            try
-            {
-                var guests = await _guestService.GetAllGuests(accompanyingBy, userId, fullName, whatsapp, hasUser, hasAccompanying, status, pageNumber, pageSize);
-                return Ok(guests);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var guests = await _guestService.GetAllGuests(
+                accompanyingBy, 
+                userId, 
+                fullName, 
+                whatsapp, 
+                hasUser, 
+                hasAccompanying, 
+                status, 
+                pageNumber, 
+                pageSize);
+            return Ok(guests);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Guest>> GetGuest(int id)
         {
-            try
-            {
-                var guest = await _guestService.GetGuest(id);
-                return Ok(guest);
-            }
-            catch (Exception ex) 
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var guest = await _guestService.GetGuest(id);
+            return Ok(guest);
         }
 
         [HttpGet("users/{userId}/accompanyings")]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<Guest>> GetAllAccompanying(string userId)
         {
-            try
-            {
-                var guest = await _guestService.GetAllGuests(accompanyingBy: userId);
-                return Ok(guest.Items);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var guest = await _guestService.GetAllGuests(accompanyingBy: userId);
+            return Ok(guest.Items);
         }
 
         [HttpPatch("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateGuest(int id, [FromBody] UpdateGuestViewModel model)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var guest = await _guestService.UpdateGuest(id, model);
-                return Ok(guest);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var guest = await _guestService.UpdateGuest(id, model);
+            return Ok(guest);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteGuest(int id)
         {
-            try
-            {
-                await _guestService.DeleteGuest(id);
-
-                return Ok(new { message = "Guest deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            await _guestService.DeleteGuest(id);
+            return Ok(new { message = "Guest deleted successfully" });
         }
     }
 }
