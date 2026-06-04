@@ -23,18 +23,11 @@ namespace BirthdayWebsiteAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateGift([FromBody] CreateGiftViewModel model)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var gift = await _giftService.CreateGift(model);
-                return Ok(gift);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var gift = await _giftService.CreateGift(model);
+            return Ok(gift);
         }
 
         [HttpGet]
@@ -46,87 +39,52 @@ namespace BirthdayWebsiteAPI.Controllers
             int pageNumber = 1,
             int pageSize = 10)
         {
-            try
-            {
-                var gifts = await _giftService.GetAllGifts(giftName, productLink, available, userId, pageNumber, pageSize);
-                return Ok(gifts);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var gifts = await _giftService.GetAllGifts(giftName, productLink, available, userId, pageNumber, pageSize);
+            return Ok(gifts);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Gift>> GetGiftById(int id)
         {
-            try
-            {
-                var gift = await _giftService.GetGiftById(id);
-                return Ok(gift);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var gift = await _giftService.GetGiftById(id);
+            return Ok(gift);
         }
 
         [HttpPatch("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateGift(int id, [FromBody] UpdateGiftViewModel model)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var updatedGift = await _giftService.UpdateGift(id, model);
-                return Ok(updatedGift);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var updatedGift = await _giftService.UpdateGift(id, model);
+            return Ok(updatedGift);
         }
 
         [HttpPatch("users/{userId}/give/{giftId}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> GiveGift(string userId, int giftId, [FromBody] GiveGiftViewModel model)
         {
-            try
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            UpdateGiftViewModel updateModel = new UpdateGiftViewModel
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                UpdateGiftViewModel updateModel = new UpdateGiftViewModel
-                {
-                    Available = true,
-                    UserId = userId,
-                    Message = model.Message,
-                };
-
-                var updatedGift = await _giftService.UpdateGift(giftId, updateModel);
-                return Ok(updatedGift);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+                Available = true,
+                UserId = userId,
+                Message = model.Message,
+            };
+            
+            var updatedGift = await _giftService.UpdateGift(giftId, updateModel);
+            return Ok(updatedGift);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteGift(int id)
         {
-            try
-            {
-                await _giftService.DeleteGift(id);
-                return Ok(new { message = "Gift deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            await _giftService.DeleteGift(id);
+            return Ok(new { message = "Gift deleted successfully" });
         }
     }
 }

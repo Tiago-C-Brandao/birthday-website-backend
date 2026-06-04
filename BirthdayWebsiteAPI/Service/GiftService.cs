@@ -1,4 +1,5 @@
 ﻿using BirthdayWebsiteAPI.Data;
+using BirthdayWebsiteAPI.Exceptions;
 using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
@@ -84,7 +85,7 @@ namespace BirthdayWebsiteAPI.Service
             var gift = await _context.Gifts.FindAsync(id);
 
             if (gift == null)
-                throw new Exception("Gift not found");
+                throw new GiftNotFoundException();
 
             return gift;
         }
@@ -94,7 +95,7 @@ namespace BirthdayWebsiteAPI.Service
             var currentGift = await _context.Gifts.FirstOrDefaultAsync(g => g.Id == id);
 
             if (currentGift == null)
-                throw new Exception("Gift not found");
+                throw new GiftNotFoundException();
 
             _entityUpdates.UpdateProperties(currentGift, model);
             await _context.SaveChangesAsync();
@@ -106,7 +107,7 @@ namespace BirthdayWebsiteAPI.Service
             var gift = await _context.Gifts.FirstOrDefaultAsync(g => g.Id == id);
 
             if (gift == null)
-                throw new Exception("Gift not found");
+                throw new GiftNotFoundException();
 
             _context.Gifts.Remove(gift);
             await _context.SaveChangesAsync();
