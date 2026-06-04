@@ -1,4 +1,5 @@
-﻿using BirthdayWebsiteAPI.Helpers;
+﻿using BirthdayWebsiteAPI.Exceptions;
+using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
 using BirthdayWebsiteAPI.ViewModels.Account;
@@ -39,7 +40,7 @@ namespace BirthdayWebsiteAPI.Service
 
             if (user == null)
             {
-                throw new Exception("Username or WhatsApp not found.");
+                throw new UserNotFoundException();
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -48,7 +49,7 @@ namespace BirthdayWebsiteAPI.Service
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
             {
-                throw new Exception("Username or password incorrect.");
+                throw new InvalidCredentialsException();
             }
 
             var token = _tokenService.GenerateToken(user, role);
@@ -78,12 +79,12 @@ namespace BirthdayWebsiteAPI.Service
 
             if (userNameValidate != null)
             {
-                throw new Exception("The username is already in use.");
+                throw new UserNameAlreadyInUseException(model.UserName);
             }
 
             if (whatsappValidate != null)
             {
-                throw new Exception("The whatsapp is already in use.");
+                throw new WhatsappAlreadyInUseException(model.WhatsApp);
             }
 
             var newUser = new User

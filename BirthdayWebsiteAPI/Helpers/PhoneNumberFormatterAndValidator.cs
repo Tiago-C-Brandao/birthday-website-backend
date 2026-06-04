@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using BirthdayWebsiteAPI.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace BirthdayWebsiteAPI.Helpers
 {
@@ -22,7 +23,7 @@ namespace BirthdayWebsiteAPI.Helpers
             }
             else
             {
-                throw new ArgumentException("Invalid phone number format.");
+                throw new WhatsappInvalidFormatException();
             }
         }
 

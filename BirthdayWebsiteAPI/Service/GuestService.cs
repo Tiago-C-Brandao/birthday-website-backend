@@ -1,11 +1,11 @@
 ﻿using BirthdayWebsiteAPI.Data;
+using BirthdayWebsiteAPI.Exceptions;
 using BirthdayWebsiteAPI.Helpers;
 using BirthdayWebsiteAPI.Interface;
 using BirthdayWebsiteAPI.Models;
 using BirthdayWebsiteAPI.Models.Enums;
 using BirthdayWebsiteAPI.ViewModels;
 using BirthdayWebsiteAPI.ViewModels.Guest;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BirthdayWebsiteAPI.Service
@@ -30,7 +30,7 @@ namespace BirthdayWebsiteAPI.Service
 
             if (whatsappValidate != null)
             {
-                throw new Exception("The whatsapp is already in use.");
+                throw new WhatsappAlreadyInUseException(model.WhatsApp);
             }
 
             Guest guest = new Guest
@@ -107,7 +107,7 @@ namespace BirthdayWebsiteAPI.Service
         {
             var guest = await _context.Guests.FindAsync(id);
             if (guest == null)
-                throw new Exception("Guest not found!");
+                throw new GuestNotFoundException();
             return guest;
         }
 
@@ -123,9 +123,9 @@ namespace BirthdayWebsiteAPI.Service
             var currentGuest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
 
             if (currentGuest == null)
-                throw new Exception("Guest not found!");
+                throw new GuestNotFoundException();
 
-            if(!string.IsNullOrEmpty(model.WhatsApp))
+            if (!string.IsNullOrEmpty(model.WhatsApp))
             {
                 var formatedWhatsApp = _phoneNumberFormatterAndValidator.FormatWhatsappNumber(model.WhatsApp);
 
@@ -135,7 +135,7 @@ namespace BirthdayWebsiteAPI.Service
 
                 if (whatsappValidate != null)
                 {
-                    throw new Exception("The whatsapp is already in use.");
+                    throw new WhatsappAlreadyInUseException(model.WhatsApp);
                 }
             }
 
@@ -148,7 +148,7 @@ namespace BirthdayWebsiteAPI.Service
         {
             var guest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
             if (guest == null)
-                throw new Exception("Guest not found!");
+                throw new GuestNotFoundException();
 
             _context.Guests.Remove(guest);
             await _context.SaveChangesAsync();
